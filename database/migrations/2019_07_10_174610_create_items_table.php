@@ -14,11 +14,16 @@ class CreateItemsTable extends Migration
     public function up()
     {
         Schema::create('items', function (Blueprint $table) {
-            $table->bigIncrements('id');
-
-            //
-
+            $table->bigIncrements('item_id');
+            $table->string('item_description');
+            $table->integer('item_children_of');
+            $table->integer('item_layer');
+            $table->unsignedBigInteger('menu_id');
             $table->timestamps();
+        });
+
+        Schema::table('items', function (Blueprint $table) {         
+            $table->foreign('menu_id')->references('menu_id')->on('menus');
         });
     }
 
