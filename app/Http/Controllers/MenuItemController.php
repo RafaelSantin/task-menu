@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\MenuItemRepository;
+use Illuminate\Support\Facades\Log;
 
 class MenuItemController extends Controller
 {
@@ -11,7 +12,6 @@ class MenuItemController extends Controller
 
     public function __construct(MenuItemRepository $menuItemRep)
     {
-        Log::info('Showing user profile for user: ');
         $this->repo = $menuItemRep;
     }
     /**
@@ -22,8 +22,8 @@ class MenuItemController extends Controller
      */
     public function store(Request $request, $menu)
     {
-        $depth = $this->repo->save($request, $menu);
-        return $depth;
+        $this->repo->save($request, $menu);
+        return $request;
     }
 
     /**
@@ -34,7 +34,9 @@ class MenuItemController extends Controller
      */
     public function show($menu)
     {
-        //
+        $return = $this->repo->get($menu);
+
+        return json_encode($return);
     }
 
     /**
@@ -45,6 +47,6 @@ class MenuItemController extends Controller
      */
     public function destroy($menu)
     {
-        //
+        $this->repo->delete($menu);
     }
 }
