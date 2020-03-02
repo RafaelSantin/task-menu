@@ -18,7 +18,7 @@ class CreateItemsTable extends Migration
             $table->string('item_description');
             $table->integer('item_children_of')->nullable();
             $table->integer('item_layer');
-            $table->unsignedBigInteger('menu_id');
+            $table->unsignedBigInteger('menu_id')->nullable();
             $table->timestamps();
         });
 

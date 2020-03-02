@@ -3,9 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Repositories\ItemRepository;
 
 class ItemController extends Controller
 {
+    private $repo;
+
+    public function __construct(ItemRepository $itemRep)
+    {
+        $this->repo = $itemRep;
+    }
+    /**
     /**
      * Store a newly created resource in storage.
      *
@@ -14,7 +22,8 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->repo->save($request);
+        return $request;
     }
 
     /**
@@ -25,7 +34,8 @@ class ItemController extends Controller
      */
     public function show($item)
     {
-        //
+        $return = $this->repo->get($item);
+        return $return;
     }
 
     /**
@@ -37,7 +47,7 @@ class ItemController extends Controller
      */
     public function update(Request $request, $item)
     {
-        //
+        $return = $this->repo->update($request, $item);
     }
 
     /**
@@ -48,6 +58,6 @@ class ItemController extends Controller
      */
     public function destroy($item)
     {
-        //
+        $this->repo->delete($item);
     }
 }

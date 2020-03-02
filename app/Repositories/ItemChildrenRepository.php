@@ -2,46 +2,36 @@
 
 namespace App\Repositories;
 
-use App\Menu;
 use App\Item;
 use App\Http\Utils\GeneralUtils;
 use Illuminate\Support\Facades\Log;
 
 
-class MenuItemRepository
+class ItemChildrenRepository
 {
-    private $menu;
     private $item;
 
-    public function __construct(Menu $menu, Item $item)
+    public function __construct( Item $item)
     {
-    	$this->menu = $menu;
         $this->item = $item;
     }
 
 
-    public function save($request, $menu)
+    public function save($request, $item)
     {   
-        $menu =  $this->menu->find($menu);
+        $item =  $this->item->find($item);
         $items = $request->all();
-        
-        // $depth = GeneralUtils::verifyDepth($request, $menu->menu_max_depth);
-        $this->saveItems($items, $menu->menu_id);
+        $this->saveItems($items, $item->item_id, ($item->item_layer + 1));
     }
 
-    public function get($menu)
+    public function get($item)
     {
-        $menuItems =  $this->item->where('menu_id',$menu)->orderBy('item_id','asc')->orderBy('item_children_of','asc')->get()->toArray();
+        $items =  $this->item->where('item_children_of',$item)->orderBy('item_id','asc')->orderBy('item_children_of','asc')->get()->toArray();
 
         $parent = null;
         $return = [];
-        foreach ($menuItems as $value) {
-            if (is_null($value['item_children_of']))
-            {    
-                $children = $this->getChildren($menuItems, $value['item_id']);
-
-                Log::info('children 1');
-                Log::info($children);
+        foreach ($items as $value) {    
+                $children = $this->getChildren($value['item_id']);
 
                 if(!empty($children)){
                     $return[] = [
@@ -52,8 +42,7 @@ class MenuItemRepository
                     $return[] = [
                             'name' => $value['item_description']
                         ];
-                } 
-            }
+                }             
                    
 
         }
@@ -61,13 +50,14 @@ class MenuItemRepository
         return $return;
     }
 
-    private function getChildren(&$items, $parent_id)
+    private function getChildren($parent_id)
     {
+        $items =  $this->item->where('item_children_of',$parent_id)->orderBy('item_id','asc')->orderBy('item_children_of','asc')->get()->toArray();
+
         $return = [];
-        foreach ($items as $key => &$value) {
-            if($value['item_children_of'] == $parent_id)
-            {
-                $children = $this->getChildren($items, $value['item_id']);
+        foreach ($items as $key => $value) {
+            Log::info($value['item_id']);
+                $children = $this->getChildren($value['item_id']);
 
                 if(!empty($children)){
                     $return[] = [
@@ -85,34 +75,31 @@ class MenuItemRepository
 
             // Log::info('array ');
             // Log::info($items);
-
-            }    
+ 
         }
          return $return;
     }
 
-    private function saveItems($data, $menu, $parent = null, $layer = 1)
+    private function saveItems($data,  $parent = null, $layer = 1)
     {       
 
         foreach ($data as $value) {
-            $layer = ($parent == null) ? 1 : $layer;
-            Log::info($value['name']);
             $new = new $this->item;
             $new->item_description = $value['name'];
             $new->item_children_of = $parent;
             $new->item_layer = $layer;
-            $new->menu_id = $menu;
             $new->save();
 
             if (isset($value['children'])  && !empty($value['children']))
             {
-                $this->saveItems($value['children'], $menu, $new->item_id, ($layer+1));
+                $this->saveItems($value['children'], $new->item_id, ($layer+1));
             }
         }
     }
 
-    public function delete($menu)
+    public function delete($item)
     {
-        $menu =  $this->item->where('menu_id',$menu)->delete();
+        //do not knwo if is to remove all subsequenced children so I will keep them
+        $this->item->where('item_children_of',$item)->delete();
     } 
 }
