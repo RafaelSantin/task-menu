@@ -47,7 +47,8 @@ class ItemController extends Controller
      */
     public function update(Request $request, $item)
     {
-        $return = $this->repo->update($request, $item);
+        $this->repo->update($request, $item);
+        return $request;
     }
 
     /**

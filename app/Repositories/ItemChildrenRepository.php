@@ -35,12 +35,12 @@ class ItemChildrenRepository
 
                 if(!empty($children)){
                     $return[] = [
-                            'name' => $value['item_description'],
+                            'field' => $value['item_description'],
                             'children' => $children
                         ];
                 }else{
                     $return[] = [
-                            'name' => $value['item_description']
+                            'field' => $value['item_description']
                         ];
                 }             
                    
@@ -61,12 +61,12 @@ class ItemChildrenRepository
 
                 if(!empty($children)){
                     $return[] = [
-                            'name' => $value['item_description'],
+                            'field' => $value['item_description'],
                             'children' => $children
                         ];
                 }else{
                     $return[] = [
-                            'name' => $value['item_description']
+                            'field' => $value['item_description']
                         ];
                 }
                  Log::info('unset 1');
@@ -85,7 +85,7 @@ class ItemChildrenRepository
 
         foreach ($data as $value) {
             $new = new $this->item;
-            $new->item_description = $value['name'];
+            $new->item_description = $value['field'];
             $new->item_children_of = $parent;
             $new->item_layer = $layer;
             $new->save();

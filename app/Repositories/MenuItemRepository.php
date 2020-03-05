@@ -54,12 +54,12 @@ class MenuItemRepository
 
                 if(!empty($children)){
                     $return[] = [
-                            'name' => $value['item_description'],
+                            'field' => $value['item_description'],
                             'children' => $children
                         ];
                 }else{
                     $return[] = [
-                            'name' => $value['item_description']
+                            'field' => $value['item_description']
                         ];
                 } 
             }
@@ -80,12 +80,12 @@ class MenuItemRepository
 
                 if(!empty($children)){
                     $return[] = [
-                            'name' => $value['item_description'],
+                            'field' => $value['item_description'],
                             'children' => $children
                         ];
                 }else{
                     $return[] = [
-                            'name' => $value['item_description']
+                            'field' => $value['item_description']
                         ];
                 }
 
@@ -105,7 +105,7 @@ class MenuItemRepository
         foreach ($data as $value) {
             $layer = ($parent == null) ? 1 : $layer;
             $new = new $this->item;
-            $new->item_description = $value['name'];
+            $new->item_description = $value['field'];
             $new->item_children_of = $parent;
             $new->item_layer = $layer;
             $new->menu_id = $menu;
@@ -128,7 +128,7 @@ class MenuItemRepository
         $item = $this->item->where('menu_id',$menu)->where('item_layer',$layer)->get();
         
         $return = $item->map(function($item){
-            return ['name' =>  $item->item_description];
+            return ['field' =>  $item->item_description];
 
         });
        
