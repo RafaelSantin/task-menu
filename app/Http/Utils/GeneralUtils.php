@@ -7,23 +7,21 @@ Class GeneralUtils
 {
 	
 
-    public static function verifyDepth($array, $max_depth, $depth = null){    
-
-    	Log::info('here');
-    	$array = $array[0];
+    public static function getDepthArray($array, $max_depth, $depth = null){    
 
     	if(is_null($depth))
     	{
     		$depth = 1;
     	}		
+        foreach ($array as $value) {
+            if (isset($value['children']) && !empty($value['children']))
+            {
+                $depth = self::getDepthArray($value['children'],$max_depth, $depth + 1);
+            }
+        }
 
-    	if (isset($array['children']) && !empty($array['children']))
-    	{
-    		$depth++;
-    		self::verifyDepth($array['children'],$max_depth, $depth);
-    	}
-
-    	return $depth;
+    	
+    	return !empty($depth) ? $depth : 0 ;
 
     }
 

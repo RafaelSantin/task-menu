@@ -24,9 +24,18 @@ class MenuItemRepository
     {   
         $menu =  $this->menu->find($menu);
         $items = $request->all();
+
+
         
-        // $depth = GeneralUtils::verifyDepth($request, $menu->menu_max_depth);
-        $this->saveItems($items, $menu->menu_id);
+        $depth = GeneralUtils::getDepthArray($items, $menu->menu_max_depth);
+
+        if($depth <= $menu->menu_max_depth)
+        {
+            $this->saveItems($items, $menu->menu_id);
+            return $request;
+        }else{
+            return 'The depth is higher then max depth for this menu';
+        }
     }
 
     public function get($menu)
@@ -79,8 +88,7 @@ class MenuItemRepository
                             'name' => $value['item_description']
                         ];
                 }
-                 Log::info('unset 1');
-            Log::info($key);
+
                 unset($value);
 
             // Log::info('array ');
@@ -96,7 +104,6 @@ class MenuItemRepository
 
         foreach ($data as $value) {
             $layer = ($parent == null) ? 1 : $layer;
-            Log::info($value['name']);
             $new = new $this->item;
             $new->item_description = $value['name'];
             $new->item_children_of = $parent;
@@ -115,4 +122,59 @@ class MenuItemRepository
     {
         $menu =  $this->item->where('menu_id',$menu)->delete();
     } 
+
+    public function getMenuLayer($menu, $layer)
+    {
+        $item = $this->item->where('menu_id',$menu)->where('item_layer',$layer)->get();
+        
+        $return = $item->map(function($item){
+            return ['name' =>  $item->item_description];
+
+        });
+       
+
+        return $return;
+    }
+
+    public function deleteMenuLayer($menu, $layer)
+    {
+        $item = $this->item->where('menu_id',$menu)->where('item_layer',$layer)->get();
+        
+        foreach ($item as $value) {
+            $this->relinkChildren($value);
+            
+            $item = $this->item->find($value->item_id);
+            $item->delete();
+        }
+  
+    }
+
+    private function relinkChildren($item, $parent = null)
+    {
+        $itemChildren = $this->item->where('item_children_of',$item->item_id)->get();
+
+        foreach ($itemChildren as $child) {
+            $this->relinkChildren($child, $item);          
+        }
+        //needed for the first call do not update the one that will be deleted
+        if($parent != null )
+        {
+            $item = $this->item->find($item->item_id);
+            $item->item_layer = $item->item_layer - 1;
+            $item->item_children_of = $parent->item_children_of;
+            $item->save();
+        }
+       
+
+    }
+
+    public function getDepth($menu)
+    {
+        $depth = $this->item->where('menu_id',$menu)->max('item_layer');
+
+        return ['depth'=> $depth];
+    }
+
+
+
 }

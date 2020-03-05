@@ -21,7 +21,7 @@ class MenuLayerController extends Controller
      */
     public function show($menu,$layer)
     {
-        $this->repo->getLayer($menu,$layer);
+        return $this->repo->getMenuLayer($menu,$layer);
     }
 
     /**
@@ -30,8 +30,8 @@ class MenuLayerController extends Controller
      * @param  mixed  $menu
      * @return \Illuminate\Http\Response
      */
-    public function destroy($menu)
+    public function destroy($menu,$layer)
     {
-        //
+        $this->repo->deleteMenuLayer($menu,$layer);
     }
 }

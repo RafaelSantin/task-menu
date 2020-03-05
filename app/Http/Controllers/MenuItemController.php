@@ -22,8 +22,8 @@ class MenuItemController extends Controller
      */
     public function store(Request $request, $menu)
     {
-        $this->repo->save($request, $menu);
-        return $request;
+        $return = $this->repo->save($request, $menu);
+        return $return;
     }
 
     /**

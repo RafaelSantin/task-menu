@@ -2,8 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\MenuItemRepository;
+
 class MenuDepthController extends Controller
 {
+    private $repo;
+
+    public function __construct(MenuItemRepository $menuItemRep)
+    {
+        $this->repo = $menuItemRep;
+    }
     /**
      * Display the specified resource.
      *
@@ -12,6 +20,6 @@ class MenuDepthController extends Controller
      */
     public function show($menu)
     {
-        //
+        return $this->repo->getDepth($menu);
     }
 }

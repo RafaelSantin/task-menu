@@ -12,7 +12,6 @@ class MenuController extends Controller
 
     public function __construct(MenuRepository $menuRep)
     {
-        Log::info('Showing user profile for user: ');
         $this->repo = $menuRep;
     }
     /**
