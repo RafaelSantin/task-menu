@@ -3,6 +3,7 @@
 /* @var $factory \Illuminate\Database\Eloquent\Factory */
 
 use App\Menu;
+use App\Item;
 use Faker\Generator as Faker;
 
 $factory->define(Menu::class, function (Faker $faker) {
@@ -12,3 +13,5 @@ $factory->define(Menu::class, function (Faker $faker) {
           "menu_max_children"=> rand(1,99)
     ];
 });
+
+

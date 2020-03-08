@@ -6,6 +6,7 @@ use App\Item;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 
 class ItemTest extends TestCase
 {
@@ -19,7 +20,13 @@ class ItemTest extends TestCase
         $response = $this->get('/api/items/1');
 
         $response->assertStatus(200);
-    }    
+    }  
+
+     /**
+     * Test Post items.
+     *
+     * @return void     
+     */  
 
     public function testPostItem()
     {
@@ -34,6 +41,12 @@ class ItemTest extends TestCase
                             ]);
     }
 
+     /**
+     * Test update items.
+     *
+     * @return void
+     */
+
     public function testUpdateItem()
     {
         $post = factory(Item::class)->create();
@@ -46,12 +59,94 @@ class ItemTest extends TestCase
             ->assertJson($data);
     }
 
+     /**
+     * Test delete items.
+     *
+     * @return void
+     */
+
     public function testDeleteItem()
     {
+
         $post = factory(Item::class)->create();
-        $post = factory(Item::class)->state('children')->create($post->item_id);
 
         $this->delete('/api/items/'.$post->item_id )
+            ->assertStatus(200);
+    }
+
+
+    /**
+     * Test Post items.
+     *
+     * @return void     
+     */  
+
+    public function testPostItemsChild()
+    {
+        $post = factory(Item::class)->create();
+        $response = $this->json('POST', '/api/items/'.$post->item_id.'/children',   [
+                                                            [
+                                                                "field" => "value",
+                                                                "children" => [
+                                                                    [
+                                                                        "field" => "value"
+                                                                    ],
+                                                                    [
+                                                                        "field" => "value"
+                                                                    ]
+                                                                ]
+                                                            ],
+                                                            [
+                                                                "field" => "value"
+                                                            ]
+                                                        ]);
+ 
+        $response
+            ->assertStatus(200)
+            ->assertJson( [
+                            [
+                                "field" => "value",
+                                "children" => [
+                                    [
+                                        "field" => "value"
+                                    ],
+                                    [
+                                        "field" => "value"
+                                    ]
+                                ]
+                            ],
+                            [
+                                "field" => "value"
+                            ]
+                        ]);
+    }
+
+    public function testGetItemChild()
+    {
+
+        $post = factory(Item::class)->create();
+        $post2 = factory(Item::class)->state('children')->create(['item_children_of' => $post->item_id]);
+
+        Log::info($post);
+        Log::info($post2);
+        $this->get('/api/items/'.$post->item_id.'/children' )
+            ->assertStatus(200)
+            ->assertJson( [
+                            [
+                                "field" => "value11"
+                            ]
+                        ]);
+    }
+
+    public function testDeleteItemChild()
+    {
+
+        $post = factory(Item::class)->create();
+        $post2 = factory(Item::class)->state('children')->create(['item_children_of' => $post->item_id]);
+
+        Log::info($post);
+        Log::info($post2);
+        $this->delete('/api/items/'.$post->item_id.'/children' )
             ->assertStatus(200);
     }
 }

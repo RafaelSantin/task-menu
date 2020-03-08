@@ -22,6 +22,7 @@ class ItemChildrenController extends Controller
     public function store(Request $request, $item)
     {
         $this->repo->save($request,$item);
+        return $request;
     }
 
     /**

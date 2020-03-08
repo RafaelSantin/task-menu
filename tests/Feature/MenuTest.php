@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Faker\Generator as Faker;
 use App\Menu;
+use App\Item;
 
 class MenuTest extends TestCase
 {
@@ -61,5 +62,88 @@ class MenuTest extends TestCase
 
         $this->delete('/api/menus/'.$post->menu_id )
             ->assertStatus(200);
+    }
+
+     public function testPostMenuItems()
+    {
+        $post = factory(Menu::class)->create();
+
+        $response = $this->json('POST', '/api/menus/'.$post->menu_id.'/items',   [
+                                                            [
+                                                                "field" => "value",
+                                                                "children" => [
+                                                                    [
+                                                                        "field" => "value"
+                                                                    ],
+                                                                    [
+                                                                        "field" => "value"
+                                                                    ]
+                                                                ]
+                                                            ],
+                                                            [
+                                                                "field" => "value"
+                                                            ]
+                                                        ]);
+ 
+        $response
+            ->assertStatus(200)
+            ->assertJson( [
+                            [
+                                "field" => "value",
+                                "children" => [
+                                    [
+                                        "field" => "value"
+                                    ],
+                                    [
+                                        "field" => "value"
+                                    ]
+                                ]
+                            ],
+                            [
+                                "field" => "value"
+                            ]
+                        ]);
+    }
+
+    public function testGetMenuItems()
+    {
+
+        $post = factory(Menu::class)->create();
+        $post2 = factory(Item::class)->state('menuItems')->create(['menu_id' => $post->menu_id]);
+
+
+        $this->get('/api/menus/'.$post->menu_id.'/items' )
+            ->assertStatus(200)
+            ->assertJson( [
+                            [
+                                "field" => "menu22"
+                            ]
+                        ]);
+    }
+
+    public function testDeleteItemChild()
+    {
+
+        $post = factory(Menu::class)->create();
+        $post2 = factory(Item::class)->state('menuItems')->create(['menu_id' => $post->menu_id]);
+
+        Log::info($post);
+        Log::info($post2);
+        $this->delete('/api/menus/'.$post->menu_id.'/items' )
+            ->assertStatus(200);
+    }
+
+     public function testMenuDepth()
+    {
+
+        $post = factory(Menu::class)->create();
+        $post2 = factory(Item::class)->state('menuItems')->create(['menu_id' => $post->menu_id]);
+
+        
+        $this->get('/api/menus/'.$post->menu_id.'/depth' )
+            ->assertStatus(200)
+            ->assertJson( [                            
+                            "field" => 2                            
+                        ]);
     }
 }
