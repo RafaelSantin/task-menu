@@ -1,5 +1,37 @@
 # Menu manager
 
+## Development
+
+This API's was build in Laravel 5.8, PHP 7, using Docker for Mysql.
+
+## Getting Start
+
+run the command lines below on a prompt.
+
+```
+ docker-compose up
+```
+
+Then in another prompt run the migration.
+
+```
+ php artisan migrate 
+```
+
+Then run the laravel serve.
+
+```
+ php artisan serve
+```
+
+
+If you like, you can run the tests by running.
+
+```
+ ./vendor/bin/phpunit
+```
+
+
 ## Table of Contents
 - [How to submit the task](#how-to-submit-the-task)
 - [Task description](#task-description)
